@@ -742,6 +742,7 @@ h4 {
 }
 .sizes-block img {
   max-width: 100%;
+  position: relative;
 }
 .sizes-block p {
   position: absolute;
@@ -847,7 +848,7 @@ h4 {
   position: absolute;
   bottom: -3rem;
   left: 15rem;
-  z-index: 1000000;
+  z-index: 1;
 }
 .feedback-block .button-order:before {
   content: '';
