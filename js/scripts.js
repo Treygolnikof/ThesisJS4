@@ -38,7 +38,9 @@ window.addEventListener('DOMContentLoaded', () => {
             popGiftClose = document.querySelector('.popup-gift .popup-close'),
             popCons = document.querySelector('.popup-consultation'),
             popDes = document.querySelector('.popup-design'),
-            popGift = document.querySelector('.popup-gift');
+            popGift = document.querySelector('.popup-gift'),
+            checkClickBtn = false,
+            checkModal = false;
 
         function openModals(btn, pop, close) {
             if (btn == gift) {
@@ -46,6 +48,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     btn.remove();
                     pop.style.display = 'block';
                     document.body.style.overflow = 'hidden';
+                    checkClickBtn = true;
+                    checkModal = true;
                 });
             } else {
                 for (let k = 0; k < btn.length; k++) {
@@ -53,6 +57,8 @@ window.addEventListener('DOMContentLoaded', () => {
                         gift.style.display = 'none';
                         pop.style.display = 'block';
                         document.body.style.overflow = 'hidden';
+                        checkClickBtn = true;
+                        checkModal = true;
                     });
                 }
             }
@@ -65,6 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     gift.style.display = 'block';
                     pop.style.display = 'none';
                     document.body.style.overflow = '';
+                    checkModal = false;
                 }
             });
     
@@ -72,11 +79,40 @@ window.addEventListener('DOMContentLoaded', () => {
                 gift.style.display = 'block';
                 pop.style.display = 'none';
                 document.body.style.overflow = '';
+                checkModal = false;
             });
         }
         openModals(desBtn, popDes, popDesClose);
         openModals(consBtn, popCons, popConsClose);
         openModals(gift, popGift, popGiftClose);
+
+        //Modal Scroll Gift
+
+        let checkGift = false;
+
+        window.onscroll = function() {
+            let scrolled = document.body.scrollHeight - window.pageYOffset;
+            if (scrolled < 1500 && !checkGift && !checkClickBtn) {
+                gift.remove();
+                popGift.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                checkGift = true;
+            } 
+        };
+
+        // Modal Timer
+
+        let timeInterval = setInterval(updateClock, 1000),
+            timer = 0;
+
+        function updateClock() {
+            timer++;
+            if (timer == 60 && !checkModal) {
+                clearInterval(timeInterval);
+                popCons.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
     }
     modals();
 
@@ -84,7 +120,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function mask() {
         let nameMask = document.querySelectorAll('input[name="name"]'),
-            comMask = document.querySelector('textarea'),
+            comMask = document.querySelectorAll('[name="message"]'),
             numMask = document.querySelectorAll('input[name="phone"]');
 
         for (let i = 0; i < numMask.length; i++) {
@@ -103,9 +139,11 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        comMask.addEventListener('input', () => {
-            comMask.value = comMask[i].value.replace(/[^а-яА-ЯёЁ/./ /,]/ig, '');
-        });
+        for (let i = 0; i < comMask.length; i++) {
+            comMask[i].addEventListener('input', () => {
+                comMask[i].value = comMask[i].value.replace(/[^а-яА-ЯёЁ/./ /,]/ig, '');
+            });
+        }
     }
     mask();
 
@@ -114,16 +152,19 @@ window.addEventListener('DOMContentLoaded', () => {
     function forms() {
         let formDes = document.querySelector('.popup-design form'),
             formCons = document.querySelector('.popup-consultation form'),
+            formMainCons = document.querySelector('.consultation form'),
             contDes = document.querySelector('.popup-design .popup-content'),
             contCons = document.querySelector('.popup-consultation .popup-content'),
+            contMainCons = document.querySelector('.consultation'),
+            popConsClose = document.querySelector('.popup-consultation .popup-close'),
+            popDesClose = document.querySelector('.popup-design .popup-close'),
             statusMessage = document.createElement('div');
-        
+
             statusMessage.classList.add('status');
     
-        function sendForm(elem, cont) {
+        function sendForm(elem, cont, close) {
             elem.addEventListener('submit', (event) => {
                 event.preventDefault(); 
-                elem.style.display = 'block';
                 cont.appendChild(statusMessage);
     
                 let formData = new FormData(elem);
@@ -158,18 +199,34 @@ window.addEventListener('DOMContentLoaded', () => {
                 postData(formData)
                     .then(() => statusMessage.innerHTML = 'Идёт загрузка...')
                     .then(() => {
+                        if (elem == formMainCons) {
+                            statusMessage.innerHTML = 'Спасибо за заявку!';
+                        } else {
                         elem.style.display = 'none';
-                        statusMessage.innerHTML = 'Спасибо за заявку';
+                        statusMessage.innerHTML = 'Спасибо за заявку!';
+                        }
                     })
                     .catch(() => {
+                        if (elem == formMainCons) {
+                            statusMessage.innerHTML = 'Произошла ошибка!';
+                        } else {
                         elem.style.display = 'none';
-                        statusMessage.innerHTML = 'Произошла ошибка';
-                    })
+                        statusMessage.innerHTML = 'Произошла ошибка!';
+                        }
+                    });
             });
+
+            if (elem == formDes || elem == formCons) {
+                close.addEventListener('click', () => {
+                    elem.style.display = 'block';
+                    statusMessage.remove();
+                });
+            }
         }
     
-        sendForm(formDes, contDes);
-        sendForm(formCons, contCons);
+        sendForm(formDes, contDes, popDesClose);
+        sendForm(formCons, contCons, popConsClose);
+        sendForm(formMainCons, contMainCons);
     }
     forms();
 
@@ -186,7 +243,7 @@ window.addEventListener('DOMContentLoaded', () => {
             optValue = 0,
             total = 0;
 
-        selSize.addEventListener('change', () =>{
+        selSize.addEventListener('change', function() {
             sizeValue = +this.value;
             total = sizeValue + matValue + optValue;
             if (sizeValue == 0 || matValue == 0) {
@@ -196,7 +253,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        selMaterial.addEventListener('change', () => {
+        selMaterial.addEventListener('change', function() {
             matValue = +this.value;
             total = sizeValue + matValue + optValue;
             if (sizeValue == 0 || matValue == 0) {
@@ -206,7 +263,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        selOptions.addEventListener('change', () => {
+        selOptions.addEventListener('change', function() {
             optValue = +this.value;
             total = sizeValue + matValue + optValue;
             if (sizeValue == 0 || matValue == 0) {
@@ -214,9 +271,9 @@ window.addEventListener('DOMContentLoaded', () => {
             } else {
                 totalValue.innerHTML = total;
             }
-        })
+        });
 
-        promoInput.addEventListener('input', () => {
+        promoInput.addEventListener('input', function() {
             if (promoInput.value != "IWANTPOPART" && sizeValue != 0 && matValue != 0) {
                 totalValue.innerHTML = total;
             } else {
@@ -266,21 +323,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < sizeBlocks.length; i++) {
             sizeBlocks[i].addEventListener('mouseover', () => {
-                img[i].setAttribute("src", "img/sizes-" + (i + 1) + "-1.png");
-                img[i].style.zIndex = '5';
+                hoverImg(i, "5", "-1.png");
             });
             sizeBlocks[i].addEventListener('mouseout', () => {
-                img[i].setAttribute("src", "img/sizes-" + (i + 1) + ".png");
-                img[i].style.zIndex = '0';
+                hoverImg(i, "0", ".png");
             });
-            sizeBlocks[i].addEventListener('touchstart', () => {
-                img[i].setAttribute("src", "img/sizes-" + (i + 1) + "-1.png");
-                img[i].style.zIndex = '5';
-            });
-            sizeBlocks[i].addEventListener('touchleave', () => {
-                img[i].setAttribute("src", "img/sizes-" + (i + 1) + ".png");
-                img[i].style.zIndex = '0';
-            });
+        }
+
+        function hoverImg(a, b, c) {
+            img[a].setAttribute("src", "img/sizes-" + (a + 1) + c);
+            img[a].style.zIndex = b;
         }
     }
     hoverPicture();
@@ -290,15 +342,19 @@ window.addEventListener('DOMContentLoaded', () => {
     function sliderBottom() {
         let slideIndex = 0,
             slides = document.querySelectorAll('.feedback-slider-item'),
-            slideInterval = setInterval(showSlides, 5000),
+            slideInterval = setInterval(showSlides, 3000),
+            feedbackDiv = document.querySelector('.feedback'),
             prev = document.querySelector('.main-prev-btn'),
             next = document.querySelector('.main-next-btn');
 
         showSlides(slideIndex);
 
         function showSlides(n) {
-            if (n > slides.length) {
+            if (n > slides.length - 1) {
                 slideIndex = 0;
+            }
+            if (n < 0) {
+                slideIndex = slides.length - 1;
             }
 
             slides.forEach((item) => item.style.display = 'none');
@@ -314,13 +370,41 @@ window.addEventListener('DOMContentLoaded', () => {
             showSlides(slideIndex += n);
         }
 
-        prev.addEventListener('click', function() {
+        prev.addEventListener('click', () => {
             plusSlides(-1);
         });
 
-        next.addEventListener('click', function() {
+        next.addEventListener('click', () => {
             plusSlides(1);
+        });
+
+        feedbackDiv.addEventListener('mouseover', () => {
+            clearInterval(slideInterval);
+        });
+
+        feedbackDiv.addEventListener('mouseout', () => {
+            slideInterval = setInterval(showSlides, 3000);
         });
     }
     sliderBottom();
+
+    // Accordion
+
+    function acrdn() {
+        let acrdn = document.getElementById('accordion'),
+            acrdnHead = document.querySelectorAll('.accordion-heading'),
+            acrdnBlock = document.querySelectorAll('.accordion-block');
+            
+        for (let i = 0; i < acrdnHead.length; i++) {
+            acrdnHead[i].addEventListener('click', () => {
+                acrdnBlock.forEach((item) => item.style.display = 'none');
+                acrdnBlock[i].style.display = 'block';
+                acrdnBlock[i].classList.add('animated');
+                acrdnBlock[i].classList.add('fadeInDown');
+                acrdnHead.forEach((item) => item.classList.remove('active'));
+                acrdnHead[i].classList.add('active');
+            });
+        }
+    }
+    acrdn();
 });
