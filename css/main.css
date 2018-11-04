@@ -199,7 +199,7 @@ h4 {
   padding: 2rem;
 }
 .header .burger-menu li:hover {
-  backgrund-color: #eed4d2;
+  background-color: #eed4d2;
 }
 .header .burger-menu li a {
   color: inherit;
@@ -421,6 +421,9 @@ h4 {
   position: absolute;
   bottom: -10rem;
   right: 0;
+}
+.styles-2 {
+  display: none;
 }
 .styles {
   position: relative;

@@ -342,32 +342,48 @@ window.addEventListener('DOMContentLoaded', () => {
     function sliderBottom() {
         let slideIndex = 0,
             slides = document.querySelectorAll('.feedback-slider-item'),
-            slideInterval = setInterval(showSlides, 3000),
+            slideInterval = setInterval(autoShowSlides, 3000),
             feedbackDiv = document.querySelector('.feedback'),
             prev = document.querySelector('.main-prev-btn'),
             next = document.querySelector('.main-next-btn');
+        
+        autoShowSlides(slideIndex);
 
-        showSlides(slideIndex);
-
-        function showSlides(n) {
-            if (n > slides.length - 1) {
+        function slideCondition(index) {
+            if (index > slides.length - 1) {
                 slideIndex = 0;
             }
-            if (n < 0) {
+            if (index < 0) {
                 slideIndex = slides.length - 1;
             }
-
+            
             slides.forEach((item) => item.style.display = 'none');
-
-            slideIndex = (slideIndex + 1) % slides.length;
-
-            slides[slideIndex].style.display = 'block';
-            slides[slideIndex].classList.add('animated');
-            slides[slideIndex].classList.add('fadeInRight');
         }
 
-        function plusSlides(n) {
-            showSlides(slideIndex += n);
+        function slideClass(side) {
+            slides[slideIndex].style.display = 'block';
+            slides[slideIndex].classList.add('animated');
+            slides[slideIndex].classList.add('fadeIn' + side);
+        }
+
+        function autoShowSlides(index) {
+            slideCondition(index);
+            slideIndex = (slideIndex + 1) % slides.length;
+            slideClass('Right');
+        }
+
+        function showSlides(index, side, remove) {
+            slideCondition(index);
+            slides[slideIndex].classList.remove('fadeIn' + remove);
+            slideClass(side);
+        }
+
+        function plusSlides(index) {
+            if (index < 0) {
+                showSlides(slideIndex += index, 'Left', 'Right');
+            } else {
+                showSlides(slideIndex += index, 'Right', 'Left');
+            }
         }
 
         prev.addEventListener('click', () => {
@@ -383,7 +399,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
         feedbackDiv.addEventListener('mouseout', () => {
-            slideInterval = setInterval(showSlides, 3000);
+            slideInterval = setInterval(autoShowSlides, 3000);
         });
     }
     sliderBottom();
@@ -407,4 +423,43 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
     acrdn();
+
+    // Burger menu
+
+    function burgerMenu() {
+        let burgerMenu = document.querySelector('.burger-menu'),
+            burgerBtn = document.querySelector('.burger'),
+            checkInterval = setInterval(widthBrowser, 500);
+
+        function widthBrowser() {
+            let check = false;
+            if (window.screen.availWidth < 768) {
+                burgerBtn.addEventListener('click', () => {
+                    if (check == false) {
+                        burgerMenu.style.display = 'block';
+                        check = true;
+                    } else {
+                        burgerMenu.style.display = 'none';
+                        check = false;
+                    }
+                });
+            } else {
+                burgerMenu.style.display = 'none';
+                check = false;
+            }
+        }       
+    }
+    burgerMenu();
+
+    // More Styles
+
+    function openMoreStyles() {
+        let stylesBtn = document.querySelector('.button-styles'),
+            moreStyles = document.querySelectorAll('.styles-2');
+
+        stylesBtn.addEventListener('click', () => {
+            moreStyles.forEach((item) => item.style.display = 'block');
+        })
+    }
+    openMoreStyles();
 });
