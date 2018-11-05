@@ -62,6 +62,8 @@ function forms() {
                         gift.style.display = 'block';
                         popup.style.display = 'none';
                         document.body.style.overflow = '';
+                        elem.style.display = 'block';
+                        statusMessage.remove();
                     }
                 }
             }
@@ -96,7 +98,7 @@ function forms() {
         if (elem == formDes || elem == formCons) {
             close.addEventListener('click', () => {
                 elem.style.display = 'block';
-                statusMessage.remove();
+                statusMessage.remove(); 
             });
         }
     }

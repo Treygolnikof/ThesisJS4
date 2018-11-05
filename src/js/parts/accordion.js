@@ -15,6 +15,7 @@ function acrdn() {
                 check = true;
             } else {
                 acrdnBlock[i].style.display = 'none';
+                acrdnHead[i].classList.remove('active');
                 check = false;
             }
         });
