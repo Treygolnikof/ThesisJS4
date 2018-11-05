@@ -7,11 +7,17 @@ function forms() {
         contMainCons = document.querySelector('.consultation'),
         popConsClose = document.querySelector('.popup-consultation .popup-close'),
         popDesClose = document.querySelector('.popup-design .popup-close'),
+        inputDes = formDes.querySelectorAll('[name]'),
+        inputCons = formCons.querySelectorAll('input'),
+        inputMainCons = formMainCons.querySelectorAll('input'),
+        gift = document.querySelector('.fixed-gift'),
+        popCons = document.querySelector('.popup-consultation'),
+        popDes = document.querySelector('.popup-design'),
         statusMessage = document.createElement('div');
 
         statusMessage.classList.add('status');
 
-    function sendForm(elem, cont, close) {
+    function sendForm(elem, cont, input, close, popup) {
         elem.addEventListener('submit', (event) => {
             event.preventDefault(); 
             cont.appendChild(statusMessage);
@@ -45,6 +51,21 @@ function forms() {
                 });
             }
 
+            function closeModal() {
+                let timeInterval = setInterval(updateClock, 1000),
+                timer = 0;
+
+                function updateClock() {
+                    timer++;
+                    if (timer == 2) {
+                        clearInterval(timeInterval);
+                        gift.style.display = 'block';
+                        popup.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                }
+            }
+
             postData(formData)
                 .then(() => statusMessage.innerHTML = 'Идёт загрузка...')
                 .then(() => {
@@ -54,6 +75,7 @@ function forms() {
                     elem.style.display = 'none';
                     statusMessage.innerHTML = 'Спасибо за заявку!';
                     }
+                    closeModal();
                 })
                 .catch(() => {
                     if (elem == formMainCons) {
@@ -61,6 +83,12 @@ function forms() {
                     } else {
                     elem.style.display = 'none';
                     statusMessage.innerHTML = 'Произошла ошибка!';
+                    }
+                    closeModal();
+                })
+                .then(() => {
+                    for (let i = 0; i < input.length; i++) {
+                        input[i].value = '';
                     }
                 });
         });
@@ -73,9 +101,9 @@ function forms() {
         }
     }
 
-    sendForm(formDes, contDes, popDesClose);
-    sendForm(formCons, contCons, popConsClose);
-    sendForm(formMainCons, contMainCons);
+    sendForm(formDes, contDes, inputDes, popDesClose, popDes);
+    sendForm(formCons, contCons, inputCons, popConsClose, popCons);
+    sendForm(formMainCons, contMainCons, inputMainCons);
 }
 
 export default forms;

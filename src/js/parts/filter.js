@@ -9,19 +9,20 @@ function filterBlock() {
         if (e.target.matches('li')) {
             portfLi.forEach((item) => item.classList.remove('active'));
             e.target.classList.add('active');
-            if (e.target.matches('.grandmother') || e.target.matches('.granddad')) {
-                portfWrap.style.display = 'none';
-                portNo.style.display = 'block';
-            } else {
                 portNo.style.display = 'none';
                 portfWrap.style.display = 'flex';
                 images.forEach((img) => img.style.display = 'none');
+                let check = false;
                 for (let i = 0; i < images.length; i++) {
                     if (images[i].classList[2] == e.target.classList[0] || e.target.classList[0] == 'all') {
                         images[i].style.display = 'block';
+                        check = true;
                     }
                 }
-            }
+                if (!check) {
+                    portfWrap.style.display = 'none';
+                    portNo.style.display = 'block';
+                }
         }
     });
 }
